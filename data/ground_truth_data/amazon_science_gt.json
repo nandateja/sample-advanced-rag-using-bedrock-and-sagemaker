@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What are the three main sub-tasks in Knowledge Base Question Answering (KBQA) as identified in the paper?",
+    "answer": "The three main sub-tasks in KBQA are topic entity detection, entity linking, and relation detection."
+  },
+  {
+    "question": "How does the proposed method handle large-scale knowledge bases efficiently?",
+    "answer": "The method uses an IR-based retrieval approach to collect high-quality candidates efficiently, enabling adaptation to large-scale KBs."
+  },
+  {
+    "question": "What is the role of BERT in the proposed KBQA framework?",
+    "answer": "BERT is used to improve accuracy across all three sub-tasks by serving as a shared encoder in the multi-task learning framework."
+  },
+  {
+    "question": "How does multi-task learning benefit the proposed KBQA model?",
+    "answer": "Multi-task learning allows the unified model to achieve further improvements with only one-third of the original parameters."
+  },
+  {
+    "question": "On which datasets did the proposed model achieve competitive or superior performance?",
+    "answer": "The model achieved competitive results on the SimpleQuestions dataset and superior performance on the FreebaseQA dataset."
+  },
+  {
+    "question": "What is the primary motivation behind creating the PRACTIQ dataset?",
+    "answer": "The PRACTIQ dataset was created to address the limitations of existing text-to-SQL datasets, which primarily focus on clear, answerable user queries. Real-world user questions are often ambiguous or unanswerable due to various factors, and PRACTIQ aims to provide a practical dataset that includes such complexities to better train and evaluate conversational text-to-SQL systems."
+  },
+  {
+    "question": "How are ambiguous and unanswerable questions defined in the PRACTIQ dataset?",
+    "answer": "In the PRACTIQ dataset, a question is considered ambiguous if it has multiple valid interpretations given the database schema. A question is deemed unanswerable if the corresponding database does not contain the data that the question is asking for."
+  },
+  {
+    "question": "What methodology was used to construct conversations in the PRACTIQ dataset?",
+    "answer": "Conversations in the PRACTIQ dataset are constructed with four turns: the initial user question, an assistant response seeking clarification, the user's clarification, and the assistant's clarified SQL response along with a natural language explanation of the execution results."
+  },
+  {
+    "question": "What are the four categories of ambiguous questions identified in the PRACTIQ dataset?",
+    "answer": "The four categories of ambiguous questions identified in the PRACTIQ dataset are: (1) Ambiguity due to multiple columns with similar names, (2) Ambiguity due to multiple tables containing similar information, (3) Ambiguity arising from unspecified aggregation operations, and (4) Ambiguity caused by vague temporal references."
+  },
+  {
+    "question": "What are the four categories of unanswerable questions identified in the PRACTIQ dataset?",
+    "answer": "The four categories of unanswerable questions identified in the PRACTIQ dataset are: (1) Questions about non-existent entities, (2) Questions requiring external knowledge not present in the database, (3) Questions involving data that is missing or incomplete, and (4) Questions that are logically inconsistent or contradictory."
+  },
+  {
+    "question": "How does the PRACTIQ dataset handle ambiguous queries without seeking user clarification?",
+    "answer": "For some ambiguous queries, the PRACTIQ dataset includes helpful SQL responses that consider multiple aspects of ambiguity, providing direct answers without requesting user clarification."
+  },
+  {
+    "question": "What approach was used to benchmark performance on the PRACTIQ dataset?",
+    "answer": "To benchmark performance on the PRACTIQ dataset, the authors implemented large language model (LLM)-based baselines using various LLMs. Their approach involves two steps: question category classification and clarification SQL prediction."
+  },
+  {
+    "question": "What were the findings regarding state-of-the-art systems' performance on ambiguous and unanswerable questions?",
+    "answer": "The experiments revealed that state-of-the-art systems struggle to handle ambiguous and unanswerable questions effectively, highlighting the need for datasets like PRACTIQ to improve system robustness."
+  },
+  {
+    "question": "Is the PRACTIQ dataset publicly available for research purposes?",
+    "answer": "Yes, the authors have indicated that they will release the code for data generation and experiments on GitHub to facilitate further research in this area."
+  },
+  {
+    "question": "What is the significance of the PRACTIQ dataset in the context of real-world applications?",
+    "answer": "The PRACTIQ dataset is significant for real-world applications as it introduces practical challenges faced in conversational text-to-SQL systems, such as handling ambiguous and unanswerable queries, thereby aiding in the development of more robust and user-friendly database query interfaces."
+  },
+  {
+    "question": "What is the primary objective of Amazon's Frontier Model Safety Framework?",
+    "answer": "The primary objective is to ensure that frontier AI models developed by Amazon do not expose critical capabilities that could create severe risks, by implementing appropriate safeguards before deployment."
+  },
+  {
+    "question": "What are 'Critical Capability Thresholds' as defined in the framework?",
+    "answer": "Critical Capability Thresholds refer to specific model capabilities within defined risk domains that, if present, could cause significant harm to public safety if misused."
+  },
+  {
+    "question": "Which risk domains are identified in the framework's Critical Capability Thresholds?",
+    "answer": "The framework identifies risk domains including Chemical, Biological, Radiological, and Nuclear (CBRN) weapons proliferation and Offensive Cyber Operations."
+  },
+  {
+    "question": "How does Amazon evaluate whether a model meets or exceeds a Critical Capability Threshold?",
+    "answer": "Amazon conducts Critical Capability Evaluations using a combination of automated and human-in-the-loop strategies to assess if models demonstrate capabilities that meet or exceed the defined thresholds."
+  },
+  {
+    "question": "What actions are taken if a model is found to meet or exceed a Critical Capability Threshold?",
+    "answer": "If a model meets or exceeds a Critical Capability Threshold, Amazon applies appropriate risk mitigation measures and does not publicly deploy the model without these safeguards in place."
+  }
+]
