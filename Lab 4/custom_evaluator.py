@@ -6,8 +6,14 @@ import tqdm
 import json
 
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import BotoCoreError, ClientError
 
+# Custom exceptions (make sure these are defined somewhere in your codebase)
+class AuthenticationError(Exception):
+    pass
+
+class RequestError(Exception):
+    pass
 
 
 
