@@ -8,7 +8,7 @@ THOUSAND = 1_000
 SECONDS_IN_MINUTE = 60
 MINUTES_IN_HOUR = 60
 # Read the CSV file into a pandas DataFrame
-df = pd.read_csv('../data/bedrock_limits_small.csv')
+df = pd.read_csv('./data/bedrock_limits_small.csv')
 
 @dataclass
 class MetricsData:
