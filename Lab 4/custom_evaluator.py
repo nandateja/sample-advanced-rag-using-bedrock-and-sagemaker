@@ -175,8 +175,6 @@ class CustomEvaluator():
             prompt = self._load_system_prompt(each)
             payload = self.create_payload(prompt)
             response = self._make_api_request(payload)
-            print(response)
-            print(type(response))
             each['response'] = self.parse_response(response)
         return data
 
