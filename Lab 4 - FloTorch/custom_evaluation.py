@@ -5,6 +5,17 @@ import requests
 import tqdm
 import json
 
+import boto3
+from botocore.exceptions import BotoCoreError, ClientError
+
+# Custom exceptions (make sure these are defined somewhere in your codebase)
+class AuthenticationError(Exception):
+    pass
+
+class RequestError(Exception):
+    pass
+
+
 
 class CustomEvaluator():
     """
@@ -15,9 +26,11 @@ class CustomEvaluator():
         self.evaluator_llm = evaluator_llm_info.get('eval_retrieval_model', '')
         self.temperature = evaluator_llm_info.get('temp_retrieval_llm', 0.1)
         self.pvalue = evaluator_llm_info.get('pvalue_retrieval_llm', 0.1)
-        prompt_file_path = '../data/eval_prompt.json'
+        prompt_file_path = './data/eval_prompt.json'
         with open(prompt_file_path, 'r') as f:
             self.prompt = json.load(f)
+        # Create a Bedrock Runtime client in the AWS Region you want to use.
+        self.client = boto3.client("bedrock-runtime", region_name=evaluator_llm_info['aws_region'])
 
     def _load_system_prompt(self, item) -> str:
         """
@@ -45,18 +58,15 @@ class CustomEvaluator():
         Returns:
             Payload dictionary for API request
         """
-        payload = {
-            "model": self.evaluator_llm,
-            "messages": [
+        payload = [
                 {
                     "role": "user",
-                    "content": prompt
+                    "content": [{"text": prompt}]
                 }
-            ],
-            "temperature": self.temperature, "top_p": 0.1
-        }
+            ]
 
         return payload
+
 
     def parse_response(self, response: str) -> Dict:
         """
@@ -123,52 +133,38 @@ class CustomEvaluator():
             AuthenticationError: If API key is invalid.
             RequestError: For other HTTP request issues.
         """
-        global response
-        api_key = 'flt_3cqiawdagpy75ae9yhah1nh2o2us53mco0h10e0ni58d49do'
-        if not api_key:
-            raise ValueError("API_KEY is not set in the environment or config")
-
-        headers = {"Authorization": api_key, "Content-Type": "application/json"}
         max_retries = 3
         base_wait_time = 1  # Initial wait time in seconds
 
         for attempt in range(max_retries):
             try:
-                response = requests.request("POST",
-                                            'https://fphcciizk3.us-east-1.awsapprunner.com/api/v1/chat/completions',
-                                            headers=headers, json=payload)
-                response_time = response.elapsed.total_seconds()
+                print(self.evaluator_llm)
+                response = self.client.converse(
+                    modelId=self.evaluator_llm,
+                    messages=payload,
+                    inferenceConfig={
+                        "temperature": self.temperature,
+                        "topP": self.pvalue,
+                    },
+                )
+                message_content = response["output"]["message"]["content"][0]["text"]
+                return message_content # Assuming the result is JSON
+            except ClientError as e:
+                # Check for authentication issues
+                error_code = e.response["Error"]["Code"]
+                if error_code in ["UnrecognizedClientException", "AccessDeniedException"]:
+                    raise AuthenticationError("Invalid or unauthorized API credentials.") from e
+                print(f"Attempt {attempt + 1} failed with client error: {e}")
+            except BotoCoreError as e:
+                print(f"Attempt {attempt + 1} failed with botocore error: {e}")
+            except Exception as e:
+                print(f"Attempt {attempt + 1} failed with unknown error: {e}")
 
-                if response.status_code == 429:  # Handle rate limiting
-                    retry_after = int(response.headers.get('Retry-After', 60))
-                    # self.logger.warning(f"Rate limit hit. Retrying after {retry_after} seconds.")
-                    time.sleep(retry_after)
-                    continue
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+            else:
+                raise RequestError("All retry attempts failed.")
 
-                response.raise_for_status()
-                response_json = response.json()
-                response_json['response_time'] = response_time
-                return response_json
-
-
-            except requests.exceptions.HTTPError as e:
-                if e.response.status_code == 401:
-                    raise
-
-                wait_time = base_wait_time * (2 ** attempt)  # Exponential backoff
-                if attempt < max_retries - 1:  # Don't log on last attempt
-                    time.sleep(wait_time)
-                else:
-                    raise
-
-            except requests.exceptions.RequestException as e:
-                if attempt < max_retries - 1:
-                    wait_time = base_wait_time * (2 ** attempt)
-                    time.sleep(wait_time)
-                else:
-                    raise
-
-        return response.json()  # In case we get here after rate limit retries
 
     def evaluate(
             self,
@@ -179,7 +175,9 @@ class CustomEvaluator():
             prompt = self._load_system_prompt(each)
             payload = self.create_payload(prompt)
             response = self._make_api_request(payload)
-            each['response'] = self.parse_response(response['choices'][0]['message']['content'])
+            print(response)
+            print(type(response))
+            each['response'] = self.parse_response(response)
         return data
 
     def evaluate_results(self, results: List[Dict[str, Any]]) -> None:
